@@ -16,7 +16,7 @@ public class BrandMigrationHelper {
         try {
             Connection connection = DbConnection.conectarseRemoto();
             String sqlBrands = "select \n"
-            		+ "id, marca_nombre, proveedor_id, fecha_creacion, activosn\n"
+            		+ "id, marca_nombre, proveedor_id, fecha_creacion, pais_id, activosn\n"
             		+ "from marcas;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlBrands);
@@ -25,7 +25,7 @@ public class BrandMigrationHelper {
                 Brand brand = new Brand();
                 brand.setId(result.getInt("id"));
                 brand.setName(result.getString("marca_nombre"));
-                brand.setCountry_id(52);
+                brand.setCountry_id(result.getInt("pais_id"));
                 brand.setSupplier_id(result.getInt("proveedor_id"));                
                 brand.setCreated_at(result.getDate("fecha_creacion"));                
                 brand.setCreated_by(1);

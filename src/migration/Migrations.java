@@ -65,6 +65,7 @@ public class Migrations {
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar existencia y reorden");
 	        }
+	        
 		
 		}	
 

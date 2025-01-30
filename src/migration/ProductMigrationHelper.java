@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -95,91 +96,74 @@ public class ProductMigrationHelper {
                 
                 productList.add(product);
             }
-            int productCounter=0;
             
+         // Conexión única
+            Connection guardar = DbConnection.conectarseLocal();
+
+            String sqlSaveProds = "INSERT INTO products (id, barcode, name, brand_id, category_id, min_purchase, min_dist, "
+                    + "tax_id, scales, avg_cost, markup, customer_price, discount_percent, unit_discount, "
+                    + "created_by, is_inventory, last_cost, is_active, is_chronical, min_sale, from_store, "
+                    + "fraction_unit, concentration, food_type, measure_content, supplier_discount, competitor_price, created_at, inventory_sum) "
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+
+            // Preparamos el statement una sola vez
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveProds);
+
+            int productCounter = 0;
             for (Product product : productList) {     
-                productCounter += 1;
-                int prodId = product.id;
-                String prodCode = product.barcode;
-                String prodName = product.name;
-                int brandId = product.brand_id;
-                int catId = product.category_id;
-                int minPurchase = product.min_purchase;
-                int minDist = product.min_dist;
-                int taxId = product.tax_id;
-                String scales = product.scales;
+                productCounter++;
 
-                // Convertimos a BigDecimal y forzamos 2 decimales
-                BigDecimal avgCost = BigDecimal.valueOf(product.avg_cost).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal markup = BigDecimal.valueOf(product.markup).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal price = BigDecimal.valueOf(product.customer_price).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal discountPercent = BigDecimal.valueOf(product.discount_percent).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal unitDiscount = BigDecimal.valueOf(product.unit_discount).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal lastCost = BigDecimal.valueOf(product.last_cost).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal concentration = BigDecimal.valueOf(product.concentration).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal supplierDiscount = BigDecimal.valueOf(product.supplier_discount).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal competitorPrice = BigDecimal.valueOf(product.competitor_price).setScale(2, RoundingMode.HALF_UP);
+                stmtsave.setInt(1, product.id);
+                stmtsave.setString(2, product.barcode);
+                stmtsave.setString(3, product.name);
+                stmtsave.setInt(4, product.brand_id);
+                stmtsave.setInt(5, product.category_id);
+                stmtsave.setInt(6, product.min_purchase);
+                stmtsave.setInt(7, product.min_dist);
+                stmtsave.setInt(8, product.tax_id);
+                stmtsave.setString(9, product.scales);
 
-                int prodCreatedBy = product.created_by;
-                boolean isInventory = product.is_inventory;
-                boolean isActive = product.is_active;
-                boolean isChronical = product.is_chronical;
-                int minSale = product.min_sale;
-                boolean fromStore = product.from_store;
-                int fractionUnit = product.fraction_unit;
-                String foodType = product.food_type;
-                String measureContent = product.measure_content;
+                // Convertimos a BigDecimal con 2 decimales
+                stmtsave.setBigDecimal(10, BigDecimal.valueOf(product.avg_cost).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBigDecimal(11, BigDecimal.valueOf(product.markup).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBigDecimal(12, BigDecimal.valueOf(product.customer_price).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBigDecimal(13, BigDecimal.valueOf(product.discount_percent).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBigDecimal(14, BigDecimal.valueOf(product.unit_discount).setScale(2, RoundingMode.HALF_UP));
+
+                stmtsave.setInt(15, product.created_by);
+                stmtsave.setBoolean(16, product.is_inventory);
+                stmtsave.setBigDecimal(17, BigDecimal.valueOf(product.last_cost).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBoolean(18, product.is_active);
+                stmtsave.setBoolean(19, product.is_chronical);
+                stmtsave.setInt(20, product.min_sale);
+                stmtsave.setBoolean(21, product.from_store);
+                stmtsave.setInt(22, product.fraction_unit);
+                stmtsave.setBigDecimal(23, BigDecimal.valueOf(product.concentration).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setString(24, product.food_type);
+                stmtsave.setString(25, product.measure_content);
+                stmtsave.setBigDecimal(26, BigDecimal.valueOf(product.supplier_discount).setScale(2, RoundingMode.HALF_UP));
+                stmtsave.setBigDecimal(27, BigDecimal.valueOf(product.competitor_price).setScale(2, RoundingMode.HALF_UP));
+
+                // Convertimos java.util.Date a java.sql.Date
                 Date createdAt = product.created_at;
-                int inventory = product.inventory_sum;
-                
-                // Conexión y consulta SQL
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSaveProds = "INSERT INTO products (id, barcode, name, brand_id, category_id, min_purchase, min_dist, "
-                        + "tax_id, scales, avg_cost, markup, customer_price, discount_percent, unit_discount, "
-                        + "created_by, is_inventory, last_cost, is_active, is_chronical, min_sale, from_store, "
-                        + "fraction_unit, concentration, food_type, measure_content, supplier_discount, competitor_price, created_at, inventory_sum) "
-                        + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-                
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveProds);
-                stmtsave.setInt(1, prodId);
-                stmtsave.setString(2, prodCode);
-                stmtsave.setString(3, prodName);
-                stmtsave.setInt(4, brandId);
-                stmtsave.setInt(5, catId);
-                stmtsave.setInt(6, minPurchase);
-                stmtsave.setInt(7, minDist);
-                stmtsave.setInt(8, taxId);
-                stmtsave.setString(9, scales);
-                stmtsave.setBigDecimal(10, avgCost);
-                stmtsave.setBigDecimal(11, markup);
-                stmtsave.setBigDecimal(12, price);
-                stmtsave.setBigDecimal(13, discountPercent);
-                stmtsave.setBigDecimal(14, unitDiscount);
-                stmtsave.setInt(15, prodCreatedBy);
-                stmtsave.setBoolean(16, isInventory);
-                stmtsave.setBigDecimal(17, lastCost);
-                stmtsave.setBoolean(18, isActive);
-                stmtsave.setBoolean(19, isChronical);
-                stmtsave.setInt(20, minSale);
-                stmtsave.setBoolean(21, fromStore);
-                stmtsave.setInt(22, fractionUnit);
-                stmtsave.setBigDecimal(23, concentration);
-                stmtsave.setString(24, foodType);
-                stmtsave.setString(25, measureContent);
-                stmtsave.setBigDecimal(26, supplierDiscount);
-                stmtsave.setBigDecimal(27, competitorPrice);
                 stmtsave.setDate(28, createdAt);
-                stmtsave.setInt(29, inventory);
                 
-                int rows = stmtsave.executeUpdate();
-                
-                if (rows > 0) {
-                    System.out.println("Producto guardado exitosamente " + productCounter);
-                }
-                
-                guardar.close();
-            
+                stmtsave.setInt(29, product.inventory_sum);
+
+                stmtsave.executeUpdate(); // Ejecutamos la inserción
+
+                System.out.println("Producto guardado exitosamente " + productCounter);
             }
+
+            // 🔹 Solo actualizamos la secuencia UNA VEZ después de importar todos los productos
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products))");
+            stmtUpdateSeq.close();
+
+            // Cerramos recursos
+            stmtsave.close();
+            guardar.close();
+
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

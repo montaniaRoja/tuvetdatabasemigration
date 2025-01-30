@@ -59,8 +59,8 @@ public class MainWindow extends JFrame {
 				Migrations.main(null);
 				Date endTime=new Date();
 				
-				long totalTime=endTime.getTime()-startTime.getTime();
-				JOptionPane.showMessageDialog(null,"tiempo total "+totalTime);
+				long totalTime=(endTime.getTime()-startTime.getTime())/1000/60;
+				JOptionPane.showMessageDialog(null,"tiempo total "+totalTime+" minutos");
 				
 				
 			}
