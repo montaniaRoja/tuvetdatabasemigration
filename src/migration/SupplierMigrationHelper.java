@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.DbConnection;
@@ -48,6 +49,11 @@ public class SupplierMigrationHelper {
                 supplierList.add(supplier);
             }
             
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSavesupplier = "INSERT INTO suppliers (id, name, nit, nrc, payee_name, address, phone,email, contact_name, created_by_id, is_active, created_at )\n"
+            		+"VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSavesupplier);
+            
             for (Supplier supplier : supplierList) {
             	
                 int supplierId = supplier.id;
@@ -63,10 +69,7 @@ public class SupplierMigrationHelper {
                 boolean supplierIsActive=supplier.isactive;
                 Date supplierCreatedAt = supplier.created_at;
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSavesupplier = "INSERT INTO suppliers (id, name, nit, nrc, payee_name, address, phone,email, contact_name, created_by_id, is_active, created_at )\n"
-                		+"VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSavesupplier);
+                
                 stmtsave.setInt(1, supplierId);
                 stmtsave.setString(2, supplierName);
                 stmtsave.setString(3, supplierNit);
@@ -84,9 +87,13 @@ public class SupplierMigrationHelper {
                 
                 if (rows > 0) {
                     System.out.println("proveedor guardado exitosamente");
-                    guardar.close();
+                    
                 }
             }
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('suppliers', 'id'), (SELECT MAX(id) FROM suppliers))");
+            stmtUpdateSeq.close();
+            guardar.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.User;
@@ -39,6 +40,11 @@ public class UserMigrationHelper {
 	                userList.add(user);
 	            }
 	            
+	            Connection guardar = DbConnection.conectarseLocal();
+                String sqlSaveUser = "INSERT INTO users (id, name, email, password, rol_id, branch_id, authorized,authorized_by, is_active, created_at)\n"
+                		+"VALUES (?,?,?,?,?,?,?,?,?,?);";
+                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveUser);
+	            
 	            for (User user : userList) {
 	            	System.out.println(user.email+" "+user.name);
 	                int userId = user.id;
@@ -52,10 +58,7 @@ public class UserMigrationHelper {
 	                boolean userIsActive=user.is_active;
 	                Date userCreatedAt = user.created_at;
 	                
-	                Connection guardar = DbConnection.conectarseLocal();
-	                String sqlSaveUser = "INSERT INTO users (id, name, email, password, rol_id, branch_id, authorized,authorized_by, is_active, created_at)\n"
-	                		+"VALUES (?,?,?,?,?,?,?,?,?,?);";
-	                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveUser);
+	                
 	                stmtsave.setInt(1, userId);
 	                stmtsave.setString(2, userName);
 	                stmtsave.setString(3, userEmail);
@@ -71,9 +74,14 @@ public class UserMigrationHelper {
 	                
 	                if (rows > 0) {
 	                    System.out.println("usuario guardado exitosamente");
-	                    guardar.close();
+	                    
 	                }
 	            }
+	            
+	            Statement stmtUpdateSeq = guardar.createStatement();
+	            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users))");
+	            stmtUpdateSeq.close();
+	            guardar.close();
 	            connection.close();
 	        } catch (SQLException e) {
 	            e.printStackTrace();

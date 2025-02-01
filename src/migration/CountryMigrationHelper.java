@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.Country;
@@ -27,25 +28,31 @@ public class CountryMigrationHelper {
                 
             }
             
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSaveCountry = "INSERT INTO countries (id, name)\n"
+            		+"VALUES (?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
+            
             for (Country country : countryList) {            	
                 int countryId = country.id;
                 String countryName = country.name;
                 
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSaveCountry = "INSERT INTO countries (id, name)\n"
-                		+"VALUES (?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
+               
                 stmtsave.setInt(1, countryId);
                 stmtsave.setString(2, countryName);
                                 
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    System.out.println("pais guardado exitosamente");
-                    guardar.close();
+                    
+                    
                 }
             }
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('countries', 'id'), (SELECT MAX(id) FROM countries))");
+            stmtUpdateSeq.close();
+            guardar.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

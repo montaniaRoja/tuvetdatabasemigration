@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.DbConnection;
@@ -33,6 +34,11 @@ public class BrandMigrationHelper {
                 brandList.add(brand);
             }
             
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSavebrand = "INSERT INTO brands (id, name, country_id, supplier_id, created_by, is_active, created_at )\n"
+            		+"VALUES (?,?,?,?,?,?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
+            
             for (Brand brand : brandList) {            	
                 int brandId = brand.id;
                 String brandName = brand.name;
@@ -42,10 +48,7 @@ public class BrandMigrationHelper {
                 boolean brandIsActive=brand.is_active;
                 Date brandCreatedAt = brand.created_at;
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSavebrand = "INSERT INTO brands (id, name, country_id, supplier_id, created_by, is_active, created_at )\n"
-                		+"VALUES (?,?,?,?,?,?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
+                
                 stmtsave.setInt(1, brandId);
                 stmtsave.setString(2, brandName);
                 stmtsave.setInt(3, brandCountry);
@@ -57,10 +60,15 @@ public class BrandMigrationHelper {
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    System.out.println("marca guardado exitosamente");
-                    guardar.close();
+                    
+                    
                 }
             }
+            
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('brands', 'id'), (SELECT MAX(id) FROM brands))");
+            stmtUpdateSeq.close();
+            guardar.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

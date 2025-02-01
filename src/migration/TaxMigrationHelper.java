@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.Tax;
@@ -31,6 +32,11 @@ public class TaxMigrationHelper {
                 
             }
             
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSaveCountry = "INSERT INTO taxes (id, name, percentage, is_active, created_at, created_by)\n"
+            		+"VALUES (?,?,?,?,?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
+            
             for (Tax tax : taxList) {            	
                 int taxId = tax.id;
                 String taxName = tax.name;
@@ -40,10 +46,7 @@ public class TaxMigrationHelper {
                 int taxCreatedBy=tax.created_by;
                 
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSaveCountry = "INSERT INTO taxes (id, name, percentage, is_active, created_at, created_by)\n"
-                		+"VALUES (?,?,?,?,?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
+                
                 stmtsave.setInt(1, taxId);
                 stmtsave.setString(2, taxName);
                 stmtsave.setFloat(3, taxPercent);
@@ -55,9 +58,14 @@ public class TaxMigrationHelper {
                 
                 if (rows > 0) {
                     System.out.println("impuesto guardado exitosamente");
-                    guardar.close();
+                    
                 }
             }
+            
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('taxes', 'id'), (SELECT MAX(id) FROM taxes))");
+            stmtUpdateSeq.close();
+            guardar.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

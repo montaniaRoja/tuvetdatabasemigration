@@ -61,16 +61,16 @@ public class BranchMigrationHelper {
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    System.out.println("Sucursal guardada exitosamente");
+                   
                     
                 }
             }
-            guardar.close();
+            
             Statement stmtUpdateSeq = guardar.createStatement();
             stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('branches', 'id'), (SELECT MAX(id) FROM branches))");
             stmtUpdateSeq.close();
 
-            
+            guardar.close();
             
             connection.close();
         } catch (SQLException e) {

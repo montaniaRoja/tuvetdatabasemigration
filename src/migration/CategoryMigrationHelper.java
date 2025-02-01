@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import models.Category;
@@ -32,6 +33,10 @@ public class CategoryMigrationHelper {
                                 
                 categoryList.add(cat);
             }
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSaveCat = "INSERT INTO categories (id, name, description, is_active, created_by,created_at )\n"
+            		+"VALUES (?,?,?,?,?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCat);
             
             for (Category cat : categoryList) {            	
                 int catId = cat.id;
@@ -41,10 +46,7 @@ public class CategoryMigrationHelper {
                 int catCreatedBy = cat.created_by;
                 Date catCreatedAt = cat.created_at;
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSaveCat = "INSERT INTO categories (id, name, description, is_active, created_by,created_at )\n"
-                		+"VALUES (?,?,?,?,?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCat);
+                
                 stmtsave.setInt(1, catId);
                 stmtsave.setString(2, catName);
                 stmtsave.setString(3, catDescription);
@@ -55,10 +57,15 @@ public class CategoryMigrationHelper {
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    System.out.println("categoria guardado exitosamente");
-                    guardar.close();
+                   
+                   
                 }
             }
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('categories', 'id'), (SELECT MAX(id) FROM categories))");
+            stmtUpdateSeq.close();
+            guardar.close();
+            
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
