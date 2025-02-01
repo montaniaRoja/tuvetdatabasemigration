@@ -71,7 +71,7 @@ public class StockMigrationHelper {
 
                 int rows = stmtsave.executeUpdate();
                 if (rows > 0) {
-                    System.out.println("Level guardada exitosamente " + counter);
+                    
                 }
             }
             

@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import models.Branch;
 import models.DbConnection;
@@ -30,7 +31,9 @@ public class BranchMigrationHelper {
                 branch.setCreated_at(result.getDate("fecha_creacion"));
                 branchList.add(branch);
             }
-            
+            Connection guardar = DbConnection.conectarseLocal();
+            String sqlSaveBranch = "INSERT INTO branches (id, name, address, phone, created_by, created_at) VALUES (?,?,?,?,?,?);";
+            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveBranch);
             
             for (Branch branch : branchList) {
                 System.out.print(branch.id + " ");
@@ -47,9 +50,7 @@ public class BranchMigrationHelper {
                 int branchCreatedBy = branch.created_by;
                 Date branchCreatedAt = branch.created_at;
                 
-                Connection guardar = DbConnection.conectarseLocal();
-                String sqlSaveBranch = "INSERT INTO branches (id, name, address, phone, created_by, created_at) VALUES (?,?,?,?,?,?);";
-                PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveBranch);
+               
                 stmtsave.setInt(1, branchId);
                 stmtsave.setString(2, branchName);
                 stmtsave.setString(3, branchAddress);
@@ -61,9 +62,16 @@ public class BranchMigrationHelper {
                 
                 if (rows > 0) {
                     System.out.println("Sucursal guardada exitosamente");
-                    guardar.close();
+                    
                 }
             }
+            guardar.close();
+            Statement stmtUpdateSeq = guardar.createStatement();
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('branches', 'id'), (SELECT MAX(id) FROM branches))");
+            stmtUpdateSeq.close();
+
+            
+            
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();

@@ -152,7 +152,7 @@ public class ProductMigrationHelper {
 
                 stmtsave.executeUpdate(); // Ejecutamos la inserción
 
-                System.out.println("Producto guardado exitosamente " + productCounter);
+                
             }
 
             // 🔹 Solo actualizamos la secuencia UNA VEZ después de importar todos los productos
