@@ -65,6 +65,12 @@ public class Migrations {
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar existencia y reorden");
 	        }
+		 
+		 if (PurchaseMigrationHelper.purchasesMigration()) {
+	            JOptionPane.showMessageDialog(null, "encaabezados de compras migrados exitosamente");
+	        }else {
+	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar encabezados de compra");
+	        }
 	        
 		
 		}	
