@@ -71,6 +71,12 @@ public class Migrations {
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar encabezados de compra");
 	        }
+		 
+		 if (PurchaseDetailMigrationHelper.purchasesMigration()) {
+	            JOptionPane.showMessageDialog(null, "detalles de compras migrados exitosamente");
+	        }else {
+	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar detalles de compra");
+	        }
 	        
 		
 		}	
