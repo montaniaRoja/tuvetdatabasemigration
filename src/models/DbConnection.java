@@ -19,11 +19,11 @@ public class DbConnection {
 	private final static String contraseniaLocal = "ofloda01";
 	  
 	 */
-	private final static String ruta = "jdbc:postgresql://localhost/tuvet";
+	private final static String ruta = "jdbc:postgresql://localhost/tuvetdb";
 	private final static String usuario = "adolfo";
 	private final static String contrasenia = "ofloda01";
 	
-	private final static String rutaLocal = "jdbc:postgresql://localhost/tuvet_laravel";
+	private final static String rutaLocal = "jdbc:postgresql://localhost/newdbtuvet";
 	private final static String usuarioLocal = "adolfo";
 	private final static String contraseniaLocal = "ofloda01";
 	
