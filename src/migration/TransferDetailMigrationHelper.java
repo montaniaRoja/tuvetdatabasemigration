@@ -60,7 +60,7 @@ public class TransferDetailMigrationHelper {
             }
             
             Statement stmtUpdateSeq = guardar.createStatement();
-            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('purchases', 'id'), (SELECT MAX(id) FROM purchases))");
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('transfer_details', 'id'), (SELECT MAX(id) FROM transfer_details))");
             stmtUpdateSeq.close();
             guardar.close();
             connection.close();
