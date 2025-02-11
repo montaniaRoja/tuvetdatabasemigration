@@ -61,7 +61,7 @@ public class BrandMigrationHelper {
                 
                 if (rows > 0) {
                     
-                    
+                    System.out.println("marca MIGRADA EXITOSAMENTE");
                 }
             }
             

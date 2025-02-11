@@ -150,8 +150,11 @@ public class ProductMigrationHelper {
                 
                 stmtsave.setInt(29, product.inventory_sum);
 
-                stmtsave.executeUpdate(); // Ejecutamos la inserción
-
+                int rows=stmtsave.executeUpdate(); // Ejecutamos la inserción
+                if (rows > 0) {
+                    System.out.println("producto guardado exitosamente");
+                    
+                }
                 
             }
 

@@ -72,7 +72,7 @@ public class PurchaseMigrationHelper {
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    
+                    System.out.println("compra migrada exitosamente");
                     
                 }
             }

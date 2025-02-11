@@ -83,6 +83,12 @@ public class Migrations {
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar traslados");
 	        }
+		 
+		 if (TransferDetailMigrationHelper.transferDetailsMigration()) {
+	            JOptionPane.showMessageDialog(null, "detalles de traslados migrados exitosamente");
+	        }else {
+	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar traslados");
+	        }
 	        
 		
 		}	

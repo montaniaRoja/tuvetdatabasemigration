@@ -81,7 +81,7 @@ public class TransferMigrationHelper {
                 
                 if (rows > 0) {
                     
-                    
+                	 System.out.println("TRASlado MIGRADA milagrosamente");
                 }
             }
             
