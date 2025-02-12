@@ -89,6 +89,12 @@ public class Migrations {
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar traslados");
 	        }
+		 
+		 if (StockEntryMigrationHelper.entriesMigration()) {
+	            JOptionPane.showMessageDialog(null, "entradas migrados exitosamente");
+	        }else {
+	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar entradas");
+	        }
 	        
 		
 		}	

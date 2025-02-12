@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 public class DbConnection {
 	
 	
-	 /*
+	 
 	  private final static String ruta = "jdbc:postgresql://svrdev.c9dhibrycbdz.us-east-2.rds.amazonaws.com/dbtuvet";
 	private final static String usuario = "apptuvet";
 	private final static String contrasenia = "T3mP0r412O23*_";
@@ -18,7 +18,7 @@ public class DbConnection {
 	private final static String usuarioLocal = "adolfo";
 	private final static String contraseniaLocal = "ofloda01";
 	  
-	 */
+	 /*
 	private final static String ruta = "jdbc:postgresql://localhost/tuvetdb";
 	private final static String usuario = "adolfo";
 	private final static String contrasenia = "ofloda01";
@@ -26,7 +26,7 @@ public class DbConnection {
 	private final static String rutaLocal = "jdbc:postgresql://localhost/newdbtuvet";
 	private final static String usuarioLocal = "adolfo";
 	private final static String contraseniaLocal = "ofloda01";
-	
+	*/
 	
 	
 	public static Connection conectarseRemoto() throws SQLException{
