@@ -16,19 +16,10 @@ public class SupplierMigrationHelper {
         ArrayList<Supplier> supplierList = new ArrayList<>();
         try {
             Connection connection = DbConnection.conectarseRemoto();
-            String sqlSuppliers = "SELECT \n"
-            		+ "    id, \n"
-            		+ "    prov_nombre, \n"
-            		+ "    prov_nit, \n"
-            		+ "    prov_nrc,\n"
-            		+ "    prov_nombrecheque, \n"
-            		+ "    (COALESCE(prov_ldireccion1, '') || ' ' || COALESCE(prov_ldireccion2, '')) AS direccion,\n"
-            		+ "    prov_telefono, \n"
-            		+ "    prov_correo, \n"
-            		+ "    prov_nombrecontacto,\n"
-            		+ "    activosn, \n"
-            		+ "    fecha_creacion\n"
-            		+ "FROM proveedores;";
+            String sqlSuppliers = "SELECT id, prov_nombre, prov_nit, prov_nrc, prov_nombrecheque, \n"
+            		+ "(COALESCE(prov_ldireccion1, '') || ' ' || COALESCE(prov_ldireccion2, '')) AS direccion,  \n"
+            		+ "prov_telefono, prov_correo, prov_nombrecontacto, activosn, fecha_creacion FROM proveedores\n"
+            		+ "order by prov_correo;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlSuppliers);
             ResultSet result = stmt.executeQuery();
