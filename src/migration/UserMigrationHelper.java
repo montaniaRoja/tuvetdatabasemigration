@@ -17,11 +17,12 @@ public class UserMigrationHelper {
 	        try {
 	            Connection connection = DbConnection.conectarseRemoto();
 	            String sqlUsers = "select e.id, e.nombre_empleado, s.correousuario, \n"
-	            		+ "e.passwd, e.sucursal_asignada, e.id_creador, e.activo_sn, e.rol_id,\n"
-	            		+ "e.fecha_creacion\n"
-	            		+ "from tbl_empleados e\n"
-	            		+ "join solicitudcontrasenia s\n"
-	            		+ "on e.id_solicitud=s.id;";
+	            		+ "	            		e.passwd, e.sucursal_asignada, e.id_creador, e.activo_sn, e.rol_id,\n"
+	            		+ "	            		e.fecha_creacion\n"
+	            		+ "	            		from tbl_empleados e\n"
+	            		+ "	            		join solicitudcontrasenia s\n"
+	            		+ "	            		on e.id_solicitud=s.id\n"
+	            		+ "						where e.rol_id is not null;";
 	            
 	            PreparedStatement stmt = connection.prepareStatement(sqlUsers);
 	            ResultSet result = stmt.executeQuery();
