@@ -102,6 +102,11 @@ public class Migrations {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar salidas");
 	        }
 	        
+		 if (CustomerMigrationHelper.customerMigration()) {
+	            JOptionPane.showMessageDialog(null, "clientes migrados exitosamente");
+	        }else {
+	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar clientes");
+	        }
 		
 		}	
 
