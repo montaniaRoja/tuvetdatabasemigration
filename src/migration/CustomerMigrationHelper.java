@@ -16,7 +16,7 @@ public class CustomerMigrationHelper {
         ArrayList<Customer> customerList = new ArrayList<>();
         try {
             Connection connection = DbConnection.conectarseRemoto();
-            String sqlCustomers = "select id, cliente_nombre, cliente_tipodoc, cliente_nodoc, birth_date, esempresasn, cliente_giro,\n"
+            String sqlCustomers = "select id, cliente_nombre, doc_type, cliente_nodoc, birth_date, esempresasn, cliente_giro,\n"
             		+ "concat(cliente_dir1,' ', cliente_dir2) as direccion, cliente_tel, cliente_correo, darcreditosn,\n"
             		+ "creadopor_id, gana_puntos, suc_id \n"
             		+ "from clientes;";
@@ -27,7 +27,7 @@ public class CustomerMigrationHelper {
                 Customer customer = new Customer();
                 customer.setId(result.getInt("id"));
                 customer.setName(result.getString("cliente_nombre"));
-                customer.setDocType(result.getInt("cliente_tipodoc"));
+                customer.setDocType(result.getInt("doc_type"));
                 customer.setDocNumber(result.getString("cliente_nodoc"));
                 customer.setBirthDate(result.getDate("birth_date"));
                 customer.setCompany(result.getBoolean("esempresasn"));
@@ -44,11 +44,10 @@ public class CustomerMigrationHelper {
             }
             
             Connection guardar = DbConnection.conectarseLocal();
-            String sqlSavebrand = "INSERT INTO customers (id, name, doc_type, doc_number, birth_date, is_company, bussines_type,address, )\n"
-            		+"phone, email, has_credit, created_by, earn_points, creation_branch, created_at \n"
-            		+"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+            String sqlSavebrand = "INSERT INTO customers (id, name, doc_type, doc_number, birth_date, is_company, bussines_type, address, phone, email, has_credit, created_by, earn_points, creation_branch, created_at) "
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
-            
+
             for (Customer customer : customerList) {            	
                 int customerId = customer.id;
                 String customerName = customer.name;
