@@ -7,7 +7,7 @@ public class Migrations {
 
 	public static void main(String[] args) {
 		
-		/*
+		
 		 if (BranchMigrationHelper.branchesMigration()) {
 	            JOptionPane.showMessageDialog(null, "Sucursales migradas exitosamente");
 	        }else {
@@ -109,18 +109,18 @@ public class Migrations {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar clientes");
 	        }
 	        
-	    */    
+	    
 		if (InvoiceMigrationHelper.invoiceMigration()) {
             JOptionPane.showMessageDialog(null, "invoices migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar invoices");
         }
-		/*
+		
 		if (InvoiceDetailMigrationHelper.invoiceMigration()) {
             JOptionPane.showMessageDialog(null, "detalle de invoices migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar detalle de invoices");
-        }*/
+        }
 		
 		}	
 

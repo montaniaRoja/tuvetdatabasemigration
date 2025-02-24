@@ -45,7 +45,7 @@ public class InvoiceDetailMigrationHelper {
             
             Connection guardar = DbConnection.conectarseLocal();
             String sqlSaveInvoice = "INSERT INTO invoice_details \n"
-                    + "(id, invoice_id, product_id, branch_id, quantity, unit_cost,\n"
+                    + "(id, invoice_id, product_id, branch_id, quantity, total_cost,\n"
                     + "unit_price, subtotal, tax_amount, discount_amount, line_total, stock_updated,\n"
                     + "is_anulled, created_at )\n"                    
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
