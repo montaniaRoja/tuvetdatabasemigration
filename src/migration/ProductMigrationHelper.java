@@ -109,9 +109,13 @@ public class ProductMigrationHelper {
             // Preparamos el statement una sola vez
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveProds);
 
-            int productCounter = 0;
+            double records=productList.size();
+            double contador=0;
+            double percent=0;
+            
+            
             for (Product product : productList) {     
-                productCounter++;
+                
 
                 stmtsave.setInt(1, product.id);
                 stmtsave.setString(2, product.barcode);
@@ -150,9 +154,15 @@ public class ProductMigrationHelper {
                 
                 stmtsave.setInt(29, product.inventory_sum);
 
-                int rows=stmtsave.executeUpdate(); // Ejecutamos la inserción
+                int rows = stmtsave.executeUpdate();
+                
+                contador+=1;
+                percent = contador/records*100;              
+               
+                
                 if (rows > 0) {
-                    System.out.println("producto guardado exitosamente");
+                	
+                   System.out.println("Porcentaje de Avance Productos "+percent+"%");
                     
                 }
                 

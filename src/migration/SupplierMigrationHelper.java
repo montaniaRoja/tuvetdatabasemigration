@@ -45,6 +45,10 @@ public class SupplierMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavesupplier);
             
+            double records=supplierList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Supplier supplier : supplierList) {
             	
                 int supplierId = supplier.id;
@@ -76,9 +80,12 @@ public class SupplierMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("proveedor guardado exitosamente");
-                    
+                	
+                   System.out.println("Porcentaje de Avance Proveedores "+percent+"%");                    
                 }
             }
             Statement stmtUpdateSeq = guardar.createStatement();

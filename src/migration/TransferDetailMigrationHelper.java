@@ -38,6 +38,10 @@ public class TransferDetailMigrationHelper {
             		
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavePurchase);
             
+            double records=detailList.size();
+            double contador=0;
+            double percent=0;
+            
             for (TransferDetail detail : detailList) {            	
                 int detailId = detail.id;
                 int transferId = detail.transferId;
@@ -53,9 +57,12 @@ public class TransferDetailMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("detalle traslado migrada exitosamente");
-                    
+                	
+                   System.out.println("Porcentaje de detalle traslados "+percent+"%");                    
                 }
             }
             

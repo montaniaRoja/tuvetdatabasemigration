@@ -37,6 +37,10 @@ public class TaxMigrationHelper {
             		+"VALUES (?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
             
+            double records=taxList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Tax tax : taxList) {            	
                 int taxId = tax.id;
                 String taxName = tax.name;
@@ -56,9 +60,12 @@ public class TaxMigrationHelper {
                                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("impuesto guardado exitosamente");
-                    
+                	
+                   System.out.println("Porcentaje de Avance impuestos "+percent+"%");                    
                 }
             }
             

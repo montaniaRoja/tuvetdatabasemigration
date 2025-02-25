@@ -33,6 +33,10 @@ public class CountryMigrationHelper {
             		+"VALUES (?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCountry);
             
+            double records=countryList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Country country : countryList) {            	
                 int countryId = country.id;
                 String countryName = country.name;
@@ -42,10 +46,15 @@ public class CountryMigrationHelper {
                 stmtsave.setInt(1, countryId);
                 stmtsave.setString(2, countryName);
                                 
+
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    
+                	
+                   System.out.println("Porcentaje de Avance Paises "+percent+"%");
                     
                 }
             }

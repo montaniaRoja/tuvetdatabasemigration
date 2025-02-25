@@ -43,6 +43,10 @@ public class PurchaseDetailMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavePurchase);
             
+            double records=purchaseDetailList.size();
+            double contador=0;
+            double percent=0;
+            
             for (PurchaseDetail purchase : purchaseDetailList) {            	
                 int purchaseDetailId = purchase.id;
                 int purchaseId = purchase.purchase_id;
@@ -66,8 +70,13 @@ public class PurchaseDetailMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;              
+               
+                
                 if (rows > 0) {
-                	System.out.println("detalle compra guardado exitosamente");
+                	
+                   System.out.println("Porcentaje de Avance detalle compras "+percent+"%");
                     
                 }
             }

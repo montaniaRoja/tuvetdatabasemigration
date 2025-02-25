@@ -47,6 +47,11 @@ public class CustomerMigrationHelper {
             String sqlSavebrand = "INSERT INTO customers (id, name, doc_type, doc_number, birth_date, is_company, bussines_type, address, phone, email, has_credit, created_by, earn_points, creation_branch, created_at) "
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
+            
+            
+            double records=customerList.size();
+            double contador=0;
+            double percent=0;
 
             for (Customer customer : customerList) {            	
                 int customerId = customer.id;
@@ -84,11 +89,15 @@ public class CustomerMigrationHelper {
                 
                 
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
+                	
+                   System.out.println("Porcentaje de Avance Clientes "+percent+"%");
                     
-                    System.out.println("cliente MIGRADA EXITOSAMENTE");
                 }
             }
             

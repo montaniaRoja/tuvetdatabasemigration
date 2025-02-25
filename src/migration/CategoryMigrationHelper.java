@@ -38,6 +38,10 @@ public class CategoryMigrationHelper {
             		+"VALUES (?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveCat);
             
+            double records=categoryList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Category cat : categoryList) {            	
                 int catId = cat.id;
                 String catName = cat.name;
@@ -54,11 +58,15 @@ public class CategoryMigrationHelper {
                 stmtsave.setInt(5, catCreatedBy);
                 stmtsave.setDate(6, catCreatedAt);
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                   
-                   
+                	
+                   System.out.println("Porcentaje de Avance Categoria "+percent+"%");
+                    
                 }
             }
             Statement stmtUpdateSeq = guardar.createStatement();

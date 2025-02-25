@@ -55,6 +55,10 @@ public class TransferMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveTransfer);
             
+            double records=transferList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Transfer transfer : transferList) {            	
                 int tId = transfer.id;
                 int tFromId=transfer.from_id;
@@ -79,9 +83,12 @@ public class TransferMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    
-                	 System.out.println("TRASlado MIGRADA milagrosamente");
+                	
+                   System.out.println("Porcentaje de traslados "+percent+"%");                    
                 }
             }
             

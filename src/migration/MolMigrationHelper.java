@@ -35,6 +35,10 @@ public class MolMigrationHelper {
             		+"VALUES (?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveMol);
             
+            double records=molList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Molecule mol : molList) {            	
                 int molId = mol.id;
                 String molName = mol.name;
@@ -50,10 +54,14 @@ public class MolMigrationHelper {
                 
                 stmtsave.setDate(5, molCreatedAt);
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                    
+                	
+                   System.out.println("Porcentaje de Avance Moleculas "+percent+"%");
                     
                 }
             }

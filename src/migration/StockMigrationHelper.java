@@ -57,9 +57,13 @@ public class StockMigrationHelper {
             String sqlSaveLevel = "INSERT INTO stocklevels ( branch_id, product_id, reorder_point, stock_amount, product_discount, created_at, updated_at) VALUES (?,?,?,?,?,?,?);";
             stmtsave = guardar.prepareStatement(sqlSaveLevel);
             
-            int counter = 0;
+            double records=branchLevelList.size();
+            double contador=0;
+            double percent=0;
+            
+            
             for (BranchLevel level : branchLevelList) {
-                counter++;
+              
 
                 stmtsave.setInt(1, level.getBranch_id());
                 stmtsave.setInt(2, level.getProduct_id());
@@ -70,8 +74,13 @@ public class StockMigrationHelper {
                 stmtsave.setDate(7, Date.valueOf(level.getUpdated_at().toLocalDate()));
 
                 int rows = stmtsave.executeUpdate();
+                
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("stock y reorden migrado milagrosamente");
+                	
+                   System.out.println("Porcentaje de Avance Stock "+percent+"%");                    
                 }
             }
             

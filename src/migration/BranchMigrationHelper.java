@@ -35,6 +35,10 @@ public class BranchMigrationHelper {
             String sqlSaveBranch = "INSERT INTO branches (id, name, address, phone, created_by, created_at) VALUES (?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveBranch);
             
+            double records=branchList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Branch branch : branchList) {
                 System.out.print(branch.id + " ");
                 System.out.print(branch.name + " ");
@@ -58,10 +62,14 @@ public class BranchMigrationHelper {
                 stmtsave.setInt(5, branchCreatedBy);
                 stmtsave.setDate(6, branchCreatedAt);
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
-                   
+                	
+                   System.out.println("Porcentaje de Avance Sucursales "+percent+"%");
                     
                 }
             }

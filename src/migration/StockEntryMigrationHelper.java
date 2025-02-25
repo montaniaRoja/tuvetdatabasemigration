@@ -44,6 +44,10 @@ public class StockEntryMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveUser);
             
+            double records=entriesList.size();
+            double contador=0;
+            double percent=0;
+            
             for (StockEntry entry : entriesList) {
             	
                 int entryId = entry.id;
@@ -70,9 +74,12 @@ public class StockEntryMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("entrada guardada milagrosamente");
-                    
+                	
+                   System.out.println("Porcentaje de Avance entradas "+percent+"%");                    
                 }
             }
             

@@ -45,6 +45,10 @@ public class UserMigrationHelper {
                 String sqlSaveUser = "INSERT INTO users (id, name, email, password, rol_id, branch_id, authorized,authorized_by, is_active, created_at)\n"
                 		+"VALUES (?,?,?,?,?,?,?,?,?,?);";
                 PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveUser);
+                
+                double records=userList.size();
+                double contador=0;
+                double percent=0;
 	            
 	            for (User user : userList) {
 	            	System.out.println(user.email+" "+user.name);
@@ -73,9 +77,12 @@ public class UserMigrationHelper {
 	                
 	                int rows = stmtsave.executeUpdate();
 	                
+	                contador+=1;
+	                percent = contador/records*100;
+	                
 	                if (rows > 0) {
-	                    System.out.println("usuario guardado exitosamente");
-	                    
+	                	
+	                   System.out.println("Porcentaje de usuarios "+percent+"%");                    
 	                }
 	            }
 	            

@@ -42,6 +42,10 @@ public class StockExitMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveUser);
             
+            double records=exitsList.size();
+            double contador=0;
+            double percent=0;
+            
             for (StockExit exit : exitsList) {
             	
                 int exitId = exit.id;
@@ -68,9 +72,12 @@ public class StockExitMigrationHelper {
                 
                 int rows = stmtsave.executeUpdate();
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 if (rows > 0) {
-                    System.out.println("salida guardada milagrosamente");
-                    
+                	
+                   System.out.println("Porcentaje de Avance salidas "+percent+"%");                    
                 }
             }
             

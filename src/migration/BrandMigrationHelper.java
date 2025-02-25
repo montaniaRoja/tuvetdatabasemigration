@@ -39,6 +39,10 @@ public class BrandMigrationHelper {
             		+"VALUES (?,?,?,?,?,?,?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
             
+            double records=brandList.size();
+            double contador=0;
+            double percent=0;
+            
             for (Brand brand : brandList) {            	
                 int brandId = brand.id;
                 String brandName = brand.name;
@@ -57,11 +61,15 @@ public class BrandMigrationHelper {
                 stmtsave.setBoolean(6, brandIsActive);
                 stmtsave.setDate(7, brandCreatedAt);
                 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
                 
                 if (rows > 0) {
+                	
+                   System.out.println("Porcentaje de Avance Marcas "+percent+"%");
                     
-                    System.out.println("marca MIGRADA EXITOSAMENTE");
                 }
             }
             

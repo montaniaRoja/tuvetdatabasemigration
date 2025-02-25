@@ -73,6 +73,10 @@ public class InvoiceMigrationHelper {
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveInvoice);
+            
+            double records=invoiceList.size();
+            double contador=0;
+            double percent=0;
 
             for (Invoice invoice : invoiceList) {            
                 int invoiceId = invoice.id;
@@ -141,10 +145,15 @@ public class InvoiceMigrationHelper {
                 stmtsave.setDate(27, createdAt);
                 stmtsave.setDate(28, updatedAt);
 
+                contador+=1;
+                percent = contador/records*100;
+                
                 int rows = stmtsave.executeUpdate();
-
+                
                 if (rows > 0) {
-                    System.out.println("Invoice MIGRADO milagrosamente");
+                	
+                   System.out.println("Porcentaje de Avance Invoices "+percent+"%");
+                    
                 }
             }
 
