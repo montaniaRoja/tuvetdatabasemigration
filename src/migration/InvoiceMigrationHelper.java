@@ -24,7 +24,7 @@ public class InvoiceMigrationHelper {
             		+ "       numero_pedido, fecha_creacion, fecha_cobro\n"
             		+ "FROM hfacturas\n"
             		+ "WHERE \n"
-            		+ "fecha_creacion < CURRENT_DATE  -- Solo facturas hasta ayer\n"
+            		+ "fecha_creacion < CURRENT_DATE AND pagada_sn=1 -- Solo facturas hasta ayer\n"
             		+ "ORDER BY id;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlInvoices);
