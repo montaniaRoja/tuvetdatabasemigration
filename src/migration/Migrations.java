@@ -122,6 +122,12 @@ public class Migrations {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar detalle de invoices");
         }
 		
+		if (CustomerPointsMigrationHelper.pointsMigration()) {
+            JOptionPane.showMessageDialog(null, "transacciones de puntos migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los puntos de los clientes");
+        }
+		
 		}	
 
 }
