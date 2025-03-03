@@ -79,7 +79,7 @@ public class CustomerPointsMigrationHelper {
             }
             
             Statement stmtUpdateSeq = guardar.createStatement();
-            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('brands', 'id'), (SELECT MAX(id) FROM brands))");
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('customer_points', 'id'), (SELECT MAX(id) FROM customer_points))");
             stmtUpdateSeq.close();
             guardar.close();
             connection.close();
