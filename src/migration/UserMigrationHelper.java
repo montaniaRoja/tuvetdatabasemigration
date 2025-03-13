@@ -35,7 +35,7 @@ public class UserMigrationHelper {
 	                user.setRol_id(result.getInt("rol_id"));
 	                user.setCreated_at(result.getDate("fecha_creacion"));
 	                user.setBranch_id(result.getInt("sucursal_asignada"));
-	                user.setAuthorized(true);
+	                user.setAuthorized(result.getBoolean("activo_sn"));
 	                user.setAuthorized_by(result.getInt("id_creador"));
 	                user.setIs_active(result.getBoolean("activo_sn"));
 	                userList.add(user);

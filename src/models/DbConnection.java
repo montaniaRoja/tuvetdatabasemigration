@@ -64,11 +64,11 @@ public class DbConnection {
 		try {
 			
 			Connection connection=conectarseRemoto();
-			JOptionPane.showMessageDialog(null,"Conexion AWS exitosa");
+			JOptionPane.showMessageDialog(null,"Conexion Google exitosa");
 			return true;
 		} catch (SQLException ex) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null,"Conexion AWS Fallo");
+			JOptionPane.showMessageDialog(null,"Conexion Google Fallo");
 			return false;
 		}
 		

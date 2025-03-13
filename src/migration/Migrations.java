@@ -128,6 +128,13 @@ public class Migrations {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los puntos de los clientes");
         }
 		
+		if (GroomerMigrationHelper.groomersMigration()) {
+            JOptionPane.showMessageDialog(null, "gromistas migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los gromistas");
+        }
+		
+		
 		}	
 
 }
