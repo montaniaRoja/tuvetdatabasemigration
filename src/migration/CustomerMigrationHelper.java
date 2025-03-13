@@ -18,7 +18,7 @@ public class CustomerMigrationHelper {
             Connection connection = DbConnection.conectarseRemoto();
             String sqlCustomers = "select id, cliente_nombre, doc_type, cliente_nodoc, birth_date, esempresasn, cliente_giro,\n"
             		+ "concat(cliente_dir1,' ', cliente_dir2) as direccion, cliente_tel, cliente_correo, darcreditosn,\n"
-            		+ "creadopor_id, gana_puntos, suc_id \n"
+            		+ "creadopor_id, gana_puntos, fecha_creacion, suc_id \n"
             		+ "from clientes;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlCustomers);
@@ -39,6 +39,7 @@ public class CustomerMigrationHelper {
                 customer.setCreatedBy(result.getInt("creadopor_id"));
                 customer.setEarnPoints(result.getBoolean("gana_puntos"));
                 customer.setCreationBranch(result.getInt("suc_id"));
+                customer.setCreatedAt(result.getDate("fecha_creacion"));
                          
                 customerList.add(customer);
             }
