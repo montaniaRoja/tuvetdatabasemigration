@@ -107,14 +107,14 @@ public class InvoiceMigrationHelper {
                 String orderNumber = invoice.orderNumber;
                 Date createdAt = invoice.createdAt;
                 Date updatedAt = invoice.updatedAt;
-
+                
+                
                 stmtsave.setInt(1, invoiceId);
                 stmtsave.setString(2, invoiceNo);
                 stmtsave.setInt(3, customerId);
                 stmtsave.setInt(4, branchId);
                 stmtsave.setInt(5, createdBy);
-                stmtsave.setInt(6, processedBy);
-                
+                stmtsave.setInt(6, processedBy);     
                
                     stmtsave.setInt(7, anulledBy);
                
@@ -132,9 +132,7 @@ public class InvoiceMigrationHelper {
                 stmtsave.setDouble(18, points);
                 stmtsave.setString(19, authorizationNumber);
                 stmtsave.setBoolean(20, alreadyPaid);
-                stmtsave.setBoolean(21, isAnulled);
-
-                
+                stmtsave.setBoolean(21, isAnulled);                
                     stmtsave.setDate(22, anullationDate);
                 
 

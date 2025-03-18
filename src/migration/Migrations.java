@@ -134,6 +134,24 @@ public class Migrations {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los gromistas");
         }
 		
+		if (BreedMigrationHelper.breedsMigration()) {
+            JOptionPane.showMessageDialog(null, "Razas migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los razas");
+        }
+		
+		if (AnalisysMigrationHelper.analysisMigration()) {
+            JOptionPane.showMessageDialog(null, "analisis migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los analisis");
+        }
+		
+		if (PetMigrationHelper.petsMigration()) {
+            JOptionPane.showMessageDialog(null, "mascotas migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los mascotas");
+        }
+		
 		
 		}	
 

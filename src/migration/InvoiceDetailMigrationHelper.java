@@ -38,6 +38,8 @@ public class InvoiceDetailMigrationHelper {
                 invoice.setStockUpdated(result.getBoolean("validado_sn"));
                 invoice.setAnulled(result.getBoolean("anulada_sn"));
                 invoice.setCreatedAt(result.getDate("fecha"));
+                invoice.setUpdatedAt(result.getDate("fecha"));
+                
                 
                          
                 invoiceList.add(invoice);
@@ -47,8 +49,8 @@ public class InvoiceDetailMigrationHelper {
             String sqlSaveInvoice = "INSERT INTO invoice_details \n"
                     + "(id, invoice_id, product_id, branch_id, quantity, total_cost,\n"
                     + "unit_price, subtotal, tax_amount, discount_amount, line_total, stock_updated,\n"
-                    + "is_anulled, created_at )\n"                    
-                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                    + "is_anulled, created_at, updated_at )\n"                    
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveInvoice);
             
@@ -74,6 +76,7 @@ public class InvoiceDetailMigrationHelper {
                 boolean isAnulled = invoice.isAnulled;
                 
                 Date createdAt = invoice.createdAt;
+                Date updatedAt = invoice.updatedAt;
                 
 
                 stmtsave.setInt(1, id);
@@ -92,6 +95,7 @@ public class InvoiceDetailMigrationHelper {
                 stmtsave.setBoolean(13, isAnulled);
 
                 stmtsave.setDate(14, createdAt);
+                stmtsave.setDate(15, updatedAt);
 
 
                 contador+=1;
