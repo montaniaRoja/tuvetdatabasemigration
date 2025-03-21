@@ -152,6 +152,26 @@ public class Migrations {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los mascotas");
         }
 		
+
+		if (HistoryMigrationHelper.historyMigration()) {
+            JOptionPane.showMessageDialog(null, "historiales migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los historiales");
+        }
+		
+		if (PrescriptionMigrationHelper.recetasMigration()) {
+            JOptionPane.showMessageDialog(null, "recetas migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los recetas");
+        }
+		
+		if (PetAnalysisMigrationHelper.analysisMigration()) {
+            JOptionPane.showMessageDialog(null, "analisis migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los analisis");
+        }
+		
+		
 		
 		}	
 
