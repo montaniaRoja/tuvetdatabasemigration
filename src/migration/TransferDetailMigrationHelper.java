@@ -1,7 +1,6 @@
 package migration;
 
 import java.sql.Connection;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,17 +11,15 @@ import models.DbConnection;
 import models.TransferDetail;
 
 public class TransferDetailMigrationHelper {
-	
 
-	public static boolean transferDetailsMigration() {
+    public static boolean transferDetailsMigration() {
         ArrayList<TransferDetail> detailList = new ArrayList<>();
-        try {
-            Connection connection = DbConnection.conectarseRemoto();
-            String sqlTransfers = "select id, id_traslado, prod_id, cantidad\n"
-            		+ "from dtraslados;";
-            
-            PreparedStatement stmt = connection.prepareStatement(sqlTransfers);
-            ResultSet result = stmt.executeQuery();
+        
+        // Obtener datos desde la base de datos remota
+        try (Connection connection = DbConnection.conectarseRemoto();
+             PreparedStatement stmt = connection.prepareStatement("SELECT id, id_traslado, prod_id, cantidad FROM dtraslados");
+             ResultSet result = stmt.executeQuery()) {
+
             while (result.next()) {
                 TransferDetail detail = new TransferDetail();
                 detail.setId(result.getInt("id"));
@@ -32,50 +29,50 @@ public class TransferDetailMigrationHelper {
                 
                 detailList.add(detail);
             }
-            
-            Connection guardar = DbConnection.conectarseLocal();
-            String sqlSavePurchase = "INSERT INTO transfer_details (id, transfer_id, product_id, quantity) VALUES (?,?,?,?);";
-            		
-            PreparedStatement stmtsave = guardar.prepareStatement(sqlSavePurchase);
-            
-            double records=detailList.size();
-            double contador=0;
-            double percent=0;
-            
-            for (TransferDetail detail : detailList) {            	
-                int detailId = detail.id;
-                int transferId = detail.transferId;
-                int productId = detail.productId;
-                int qty = detail.quantity;
-                                
-                
-                stmtsave.setInt(1, detailId);
-                stmtsave.setInt(2, transferId);
-                stmtsave.setInt(3, productId);
-                stmtsave.setInt(4, qty);
-                
-                
-                int rows = stmtsave.executeUpdate();
-                
-                contador+=1;
-                percent = contador/records*100;
-                
-                if (rows > 0) {
-                	
-                   System.out.println("Porcentaje de detalle traslados "+percent+"%");                    
-                }
-            }
-            
-            Statement stmtUpdateSeq = guardar.createStatement();
-            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('transfer_details', 'id'), (SELECT MAX(id) FROM transfer_details))");
-            stmtUpdateSeq.close();
-            guardar.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-        
+
+        if (detailList.isEmpty()) {
+            System.out.println("No hay datos para migrar en transfer_details.");
+            return true;
+        }
+
+        // Insertar datos en la base de datos local
+        try (Connection guardar = DbConnection.conectarseLocal();
+             PreparedStatement stmtsave = guardar.prepareStatement(
+                 "INSERT INTO transfer_details (id, transfer_id, product_id, quantity) VALUES (?,?,?,?)");
+             Statement stmtUpdateSeq = guardar.createStatement()) {
+
+            int batchSize = 100;
+            int count = 0;
+            int totalRecords = detailList.size();
+
+            for (TransferDetail detail : detailList) {
+                stmtsave.setInt(1, detail.getId());
+                stmtsave.setInt(2, detail.getTransferId());
+                stmtsave.setInt(3, detail.getProductId());
+                stmtsave.setInt(4, detail.getQuantity());
+
+                stmtsave.addBatch();
+                count++;
+
+                if (count % batchSize == 0 || count == totalRecords) {
+                    stmtsave.executeBatch();
+                    System.out.printf("Progreso de migración: %.2f%%%n", (count / (double) totalRecords) * 100);
+                }
+            }
+
+            // Actualizar la secuencia del ID en PostgreSQL
+            stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('transfer_details', 'id'), COALESCE((SELECT MAX(id) FROM transfer_details), 1))");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        System.out.println("Migración de transfer_details completada.");
         return true;
-	}
+    }
 }

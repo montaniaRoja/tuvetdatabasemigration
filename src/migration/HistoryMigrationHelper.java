@@ -7,114 +7,118 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import models.DbConnection;
 import models.MedicalHistory;
 
 public class HistoryMigrationHelper {
-	public static boolean historyMigration() {
+    private static final int BATCH_SIZE = 500; // Definir el tamaño de los lotes
+
+    public static boolean historyMigration() {
         ArrayList<MedicalHistory> historyList = new ArrayList<>();
+        Connection remoteConn = null;
+        Connection localConn = null;
+        PreparedStatement stmtSave = null;
+        ResultSet resultSet = null;
+
         try {
-            Connection connection = DbConnection.conectarseRemoto();
-            String sqlHistory = "select id, mascota_id, medico_id, sucursal_atendio, \n"
-            		+ "motivo_visita, anamnesis, sintomas_mascota, habitat,\n"
-            		+ "temperatura_mascota, dieta, peso_mascota, diagnostico,\n"
-            		+ "fecha_visita, proxima_cita\n"
-            		+ "from historial_mascotas;";
+            // Conectar a la base de datos remota
+            remoteConn = DbConnection.conectarseRemoto();
+            String sqlHistory = "SELECT id, mascota_id, medico_id, sucursal_atendio, motivo_visita, anamnesis, sintomas_mascota, habitat, " +
+                                "temperatura_mascota, dieta, peso_mascota, diagnostico, fecha_visita, proxima_cita FROM historial_mascotas";
             
-            PreparedStatement stmt = connection.prepareStatement(sqlHistory);
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
+            PreparedStatement stmt = remoteConn.prepareStatement(sqlHistory);
+            resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
                 MedicalHistory history = new MedicalHistory();
-                history.setId(result.getInt("id"));
-                history.setPetId(result.getInt("mascota_id"));
-                history.setVetId(result.getInt("medico_id"));
-                history.setBranchId(result.getInt("sucursal_atendio"));
-                history.setReason(result.getString("motivo_visita"));
-                history.setAnamnesis(result.getString("anamnesis"));
-                history.setSymptoms(result.getString("sintomas_mascota"));
-                history.setHabitat(result.getString("habitat"));
-                history.setTemperature(result.getString("temperatura_mascota"));
-                history.setDiet(result.getString("dieta"));
-                history.setWeight(result.getString("peso_mascota"));
-                history.setDiagnosis(result.getString("diagnostico"));
-                history.setCreatedAt(result.getDate("fecha_visita"));
-                history.setNextVisit(result.getDate("proxima_cita"));               
-               
-                                
+                history.setId(resultSet.getInt("id"));
+                history.setPetId(resultSet.getInt("mascota_id"));
+                history.setVetId(resultSet.getInt("medico_id"));
+                history.setBranchId(resultSet.getInt("sucursal_atendio"));
+                history.setReason(resultSet.getString("motivo_visita"));
+                history.setAnamnesis(resultSet.getString("anamnesis"));
+                history.setSymptoms(resultSet.getString("sintomas_mascota"));
+                history.setHabitat(resultSet.getString("habitat"));
+                history.setTemperature(resultSet.getString("temperatura_mascota"));
+                history.setDiet(resultSet.getString("dieta"));
+                history.setWeight(resultSet.getString("peso_mascota"));
+                history.setDiagnosis(resultSet.getString("diagnostico"));
+                history.setCreatedAt(resultSet.getDate("fecha_visita"));
+                history.setNextVisit(resultSet.getDate("proxima_cita"));
+                
                 historyList.add(history);
             }
-            
-            Connection guardar = DbConnection.conectarseLocal();
-            String sqlSaveHistory = "INSERT INTO pet_histories (id, pet_id, vet_id, branch_id, reason, anamnesis, symptoms, habitat, temperature,\n"
-            		+"diet, weight, diagnosis, next_visit, created_at)\n"
-            		+"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-            
-            PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveHistory);
-            
-            double records=historyList.size();
-            double contador=0;
-            double percent=0;
-            
-            for (MedicalHistory history : historyList) {            	
-                int historyId = history.id;
-                int petId=history.petId;
-                int vetId = history.vetId;
-                int branchId = history.branchId;
-                String reason = history.reason;
-                String anamnesis = history.anamnesis;
-                
-                String symptoms=history.symptoms;
-                String habitat=history.habitat;
-                String temp=history.temperature;
-                String diet=history.diet;
-                String weight=history.weight;
-                		String diagnosis=history.diagnosis;
-                		Date nextV=history.nextVisit;
-                		Date createdAt=history.createdAt; 
-                
-                
-                stmtsave.setInt(1, historyId);
-                stmtsave.setInt(2, petId);
-                stmtsave.setInt(3, vetId);
-                stmtsave.setInt(4, branchId);
-                
-                stmtsave.setString(5, reason);
-                
-                stmtsave.setString(6, anamnesis);
-                stmtsave.setString(7, symptoms);
-                stmtsave.setString(8, habitat);
-                stmtsave.setString(9, temp);
-                stmtsave.setString(10, diet);
-                stmtsave.setString(11, weight);
-                stmtsave.setString(12, diagnosis);
-                stmtsave.setDate(13, nextV);
-                stmtsave.setDate(14, createdAt);
-                 
-                
-                
-                contador+=1;
-                percent = contador/records*100;
-                
-                int rows = stmtsave.executeUpdate();
-                
-                if (rows > 0) {
-                	
-                   System.out.println("Porcentaje de Avance historiales "+percent+"%");
-                    
+
+            // Conectar a la base de datos local
+            localConn = DbConnection.conectarseLocal();
+            localConn.setAutoCommit(false); // Deshabilita auto-commit para mejorar rendimiento
+
+            String sqlInsert = "INSERT INTO pet_histories (id, pet_id, vet_id, branch_id, reason, anamnesis, symptoms, habitat, temperature, " +
+                               "diet, weight, diagnosis, next_visit, created_at) " +
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            stmtSave = localConn.prepareStatement(sqlInsert);
+            int batchCounter = 0;
+
+            for (MedicalHistory history : historyList) {
+                stmtSave.setInt(1, history.getId());
+                stmtSave.setInt(2, history.getPetId());
+                stmtSave.setInt(3, history.getVetId());
+                stmtSave.setInt(4, history.getBranchId());
+                stmtSave.setString(5, history.getReason());
+                stmtSave.setString(6, history.getAnamnesis());
+                stmtSave.setString(7, history.getSymptoms());
+                stmtSave.setString(8, history.getHabitat());
+                stmtSave.setString(9, history.getTemperature());
+                stmtSave.setString(10, history.getDiet());
+                stmtSave.setString(11, history.getWeight());
+                stmtSave.setString(12, history.getDiagnosis());
+                stmtSave.setDate(13, history.getNextVisit());
+                stmtSave.setDate(14, history.getCreatedAt());
+
+                stmtSave.addBatch();
+                batchCounter++;
+
+                // Ejecutar el batch después de alcanzar el tamaño definido
+                if (batchCounter % BATCH_SIZE == 0) {
+                    stmtSave.executeBatch();
+                    localConn.commit();
+                    System.out.printf("Migradas %d historiales...\n", batchCounter);
                 }
             }
-            
-            Statement stmtUpdateSeq = guardar.createStatement();
+
+            // Ejecutar el batch restante
+            stmtSave.executeBatch();
+            localConn.commit();
+
+            // Actualizar la secuencia en PostgreSQL
+            Statement stmtUpdateSeq = localConn.createStatement();
             stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('pet_histories', 'id'), (SELECT MAX(id) FROM pet_histories))");
             stmtUpdateSeq.close();
-            guardar.close();
-            connection.close();
+
+            System.out.println("Migración de historiales completada exitosamente.");
+            return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
+            if (localConn != null) {
+                try {
+                    localConn.rollback(); // Realiza rollback en caso de error
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
             return false;
+
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (stmtSave != null) stmtSave.close();
+                if (localConn != null) localConn.setAutoCommit(true); // Restaurar el auto-commit
+                if (localConn != null) localConn.close();
+                if (remoteConn != null) remoteConn.close();
+            } catch (SQLException closeEx) {
+                closeEx.printStackTrace();
+            }
         }
-        
-        return true;
-	}
+    }
 }

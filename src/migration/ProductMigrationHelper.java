@@ -6,60 +6,62 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
+import java.util.ArrayList;
 import models.Product;
 import models.DbConnection;
 
 public class ProductMigrationHelper {
-	public static boolean productsMigration() {
+    private static final int BATCH_SIZE = 100;  // Tamaño del lote (puedes ajustar este valor según tus necesidades)
+
+    public static boolean productsMigration() {
         ArrayList<Product> productList = new ArrayList<>();
         try {
+            // Conexión remota
             Connection connection = DbConnection.conectarseRemoto();
             String sqlProducts = "SELECT \n"
-            		+ "    p.id as prodid, \n"
-            		+ "    prod_codbarra, \n"
-            		+ "    prod_nombre, \n"
-            		+ "    id_marca, \n"
-            		+ "    id_categorias, \n"
-            		+ "    prod_compraminima, \n"
-            		+ "    prod_distminima,\n"
-            		+ "    codigo_impuesto, \n"
-            		+ "    escalas, \n"
-            		+ "    prod_costopromedio, \n"
-            		+ "    prod_markup, \n"
-            		+ "    prod_preciopublico, \n"
-            		+ "    prod_porcdescuento,\n"
-            		+ "    descuento_unidad, \n"
-            		+ "    prod_esinventariosn, \n"
-            		+ "    prod_ultimocosto, \n"
-            		+ "    activosn, \n"
-            		+ "    cronico_sn, \n"
-            		+ "    prod_ventaminima,\n"
-            		+ "    bodegasn, \n"
-            		+ "    unidad_fraccion, \n"
-            		+ "    concentracion, \n"
-            		+ "    tipo_alimento, \n"
-            		+ "    contenido, \n"
-            		+ "    prov_descuento, \n"
-            		+ "    precio_competencia, \n"
-            		+ "    fecha_creacion,\n"
-            		+ "    SUM(e.existencia) AS existencia\n"
-            		+ "FROM \n"
-            		+ "    productos p\n"
-            		+ "JOIN \n"
-            		+ "    existencias e\n"
-            		+ "ON \n"
-            		+ "    e.codbarra = prod_codbarra\n"
-            		+ "WHERE \n"
-            		+ "    prod_nombre IS NOT NULL\n"
-            		+ "GROUP BY \n"
-            		+ "    p.id\n"
-            		+ "ORDER BY \n"
-            		+ "    p.prod_nombre;";
-            
+                    + "    p.id as prodid, \n"
+                    + "    prod_codbarra, \n"
+                    + "    prod_nombre, \n"
+                    + "    id_marca, \n"
+                    + "    id_categorias, \n"
+                    + "    prod_compraminima, \n"
+                    + "    prod_distminima,\n"
+                    + "    codigo_impuesto, \n"
+                    + "    escalas, \n"
+                    + "    prod_costopromedio, \n"
+                    + "    prod_markup, \n"
+                    + "    prod_preciopublico, \n"
+                    + "    prod_porcdescuento,\n"
+                    + "    descuento_unidad, \n"
+                    + "    prod_esinventariosn, \n"
+                    + "    prod_ultimocosto, \n"
+                    + "    activosn, \n"
+                    + "    cronico_sn, \n"
+                    + "    prod_ventaminima,\n"
+                    + "    bodegasn, \n"
+                    + "    unidad_fraccion, \n"
+                    + "    concentracion, \n"
+                    + "    tipo_alimento, \n"
+                    + "    contenido, \n"
+                    + "    prov_descuento, \n"
+                    + "    precio_competencia, \n"
+                    + "    fecha_creacion,\n"
+                    + "    SUM(e.existencia) AS existencia\n"
+                    + "FROM \n"
+                    + "    productos p\n"
+                    + "JOIN \n"
+                    + "    existencias e\n"
+                    + "ON \n"
+                    + "    e.codbarra = prod_codbarra\n"
+                    + "WHERE \n"
+                    + "    prod_nombre IS NOT NULL\n"
+                    + "GROUP BY \n"
+                    + "    p.id\n"
+                    + "ORDER BY \n"
+                    + "    p.prod_nombre;";
+
             PreparedStatement stmt = connection.prepareStatement(sqlProducts);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -96,8 +98,8 @@ public class ProductMigrationHelper {
                 
                 productList.add(product);
             }
-            
-         // Conexión única
+
+            // Conexión local para guardar
             Connection guardar = DbConnection.conectarseLocal();
 
             String sqlSaveProds = "INSERT INTO products (id, barcode, name, brand_id, category_id, min_purchase, min_dist, "
@@ -106,17 +108,16 @@ public class ProductMigrationHelper {
                     + "fraction_unit, concentration, food_type, measure_content, supplier_discount, competitor_price, created_at, inventory_sum) "
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
-            // Preparamos el statement una sola vez
+            // Preparamos el statement para insertar productos
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSaveProds);
 
-            double records=productList.size();
-            double contador=0;
-            double percent=0;
-            
-            
-            for (Product product : productList) {     
-                
+            // Procesar productos en lotes
+            double records = productList.size();
+            double contador = 0;
+            double percent = 0;
+            int batchCounter = 0;
 
+            for (Product product : productList) {
                 stmtsave.setInt(1, product.id);
                 stmtsave.setString(2, product.barcode);
                 stmtsave.setString(3, product.name);
@@ -126,14 +127,11 @@ public class ProductMigrationHelper {
                 stmtsave.setInt(7, product.min_dist);
                 stmtsave.setInt(8, product.tax_id);
                 stmtsave.setString(9, product.scales);
-
-                // Convertimos a BigDecimal con 2 decimales
                 stmtsave.setBigDecimal(10, BigDecimal.valueOf(product.avg_cost).setScale(2, RoundingMode.HALF_UP));
                 stmtsave.setBigDecimal(11, BigDecimal.valueOf(product.markup).setScale(2, RoundingMode.HALF_UP));
                 stmtsave.setBigDecimal(12, BigDecimal.valueOf(product.customer_price).setScale(2, RoundingMode.HALF_UP));
                 stmtsave.setBigDecimal(13, BigDecimal.valueOf(product.discount_percent).setScale(2, RoundingMode.HALF_UP));
                 stmtsave.setBigDecimal(14, BigDecimal.valueOf(product.unit_discount).setScale(2, RoundingMode.HALF_UP));
-
                 stmtsave.setInt(15, product.created_by);
                 stmtsave.setBoolean(16, product.is_inventory);
                 stmtsave.setBigDecimal(17, BigDecimal.valueOf(product.last_cost).setScale(2, RoundingMode.HALF_UP));
@@ -147,43 +145,44 @@ public class ProductMigrationHelper {
                 stmtsave.setString(25, product.measure_content);
                 stmtsave.setBigDecimal(26, BigDecimal.valueOf(product.supplier_discount).setScale(2, RoundingMode.HALF_UP));
                 stmtsave.setBigDecimal(27, BigDecimal.valueOf(product.competitor_price).setScale(2, RoundingMode.HALF_UP));
-
-                // Convertimos java.util.Date a java.sql.Date
-                Date createdAt = product.created_at;
-                stmtsave.setDate(28, createdAt);
-                
+                stmtsave.setDate(28, product.created_at);
                 stmtsave.setInt(29, product.inventory_sum);
 
-                int rows = stmtsave.executeUpdate();
-                
-                contador+=1;
-                percent = contador/records*100;              
-               
-                
-                if (rows > 0) {
-                	
-                   System.out.println("Porcentaje de Avance Productos "+percent+"%");
-                    
+                // Añadir a lote
+                stmtsave.addBatch();
+                batchCounter++;
+
+                // Ejecutar lote cuando se alcanza el tamaño del lote
+                if (batchCounter == BATCH_SIZE) {
+                    stmtsave.executeBatch();
+                    batchCounter = 0;  // Reset del contador del lote
                 }
-                
+
+                contador++;
+                percent = contador / records * 100;
+                System.out.println("Porcentaje de Avance Productos: " + percent + "%");
             }
 
-            // 🔹 Solo actualizamos la secuencia UNA VEZ después de importar todos los productos
+            // Ejecutar el lote restante si existe
+            if (batchCounter > 0) {
+                stmtsave.executeBatch();
+            }
+
+            // Actualizar la secuencia de la tabla después de todas las inserciones
             Statement stmtUpdateSeq = guardar.createStatement();
             stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products))");
             stmtUpdateSeq.close();
 
-            // Cerramos recursos
+            // Cerrar recursos
             stmtsave.close();
             guardar.close();
-
             connection.close();
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-        
+
         return true;
     }
-
 }

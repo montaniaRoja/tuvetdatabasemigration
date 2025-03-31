@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import models.Ip;
 import models.DbConnection;
@@ -16,20 +18,32 @@ public class IpMigrationHelper {
         ArrayList<Ip> ipList = new ArrayList<>();
         try {
             Connection connection = DbConnection.conectarseRemoto();
-            String sqlIps = "select * from paises order by id;";
+            String sqlIps = "SELECT DISTINCT * FROM ippermitidas;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlIps);
             ResultSet result = stmt.executeQuery();
+         // Usamos un HashSet para almacenar las IPs ya agregadas
+            Set<String> ipSet = new HashSet<>();
+
             while (result.next()) {
-                Ip ip = new Ip();
-                ip.setId(result.getInt("ip_id"));
-                ip.setIp(result.getString("ip_asignada"));
-                ip.setBranchId(result.getInt("id_sucursal"));
-                ip.setCreatedAt(result.getDate("fecha_creacion"));
+                String ipAsignada = result.getString("ip_asignada");
                 
-                ipList.add(ip);
-                
+                // Verificamos si la IP ya está en el conjunto
+                if (!ipSet.contains(ipAsignada)) {
+                    Ip ip = new Ip();
+                    ip.setId(result.getInt("ip_id"));
+                    ip.setIp(ipAsignada);
+                    ip.setBranchId(result.getInt("id_sucursal"));
+                    ip.setCreatedAt(result.getDate("fecha_creacion"));
+                    
+                    // Agregamos la IP al conjunto para evitar duplicados
+                    ipSet.add(ipAsignada);
+                    
+                    // Agregamos la IP a la lista
+                    ipList.add(ip);
+                }
             }
+
             
             Connection guardar = DbConnection.conectarseLocal();
             String sqlSaveCountry = "INSERT INTO authorized_ips (id, ip,branch_id, created_by, created_at)\n"
@@ -46,8 +60,6 @@ public class IpMigrationHelper {
                 int branch=ip.branchId;
                 int createdBy=1;
                 Date createdAt=ip.createdAt;
-                
-                
                
                 stmtsave.setInt(1, ipId);
                 stmtsave.setString(2, ipIp);

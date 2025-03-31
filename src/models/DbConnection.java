@@ -10,11 +10,11 @@ public class DbConnection {
 	
 	
 	 
-	  private final static String ruta = "jdbc:postgresql://34.29.157.119/tuvetdb";
+	private final static String ruta = "jdbc:postgresql://34.29.157.119/tuvetdb";
 	private final static String usuario = "tuvet-user";
 	private final static String contrasenia = "ofloda01";
 	
-	private final static String rutaLocal = "jdbc:postgresql://localhost/tuvetdb";
+	private final static String rutaLocal = "jdbc:postgresql://127.0.0.1/tuvetnewdb";
 	private final static String usuarioLocal = "adolfo";
 	private final static String contraseniaLocal = "ofloda01";
 	  

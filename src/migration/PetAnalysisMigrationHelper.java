@@ -11,11 +11,11 @@ import models.PetAnalysis;
 import models.DbConnection;
 
 public class PetAnalysisMigrationHelper {
-	public static boolean analysisMigration() {
+    public static boolean analysisMigration() {
         ArrayList<PetAnalysis> analysisList = new ArrayList<>();
         try {
             Connection connection = DbConnection.conectarseRemoto();
-            String sqlBreeds = "select id, historial_id, analisis_id from analisis_mascota;";
+            String sqlBreeds = "SELECT id, historial_id, analisis_id FROM analisis_mascota;";
             
             PreparedStatement stmt = connection.prepareStatement(sqlBreeds);
             ResultSet result = stmt.executeQuery();
@@ -23,49 +23,47 @@ public class PetAnalysisMigrationHelper {
                 PetAnalysis analysis = new PetAnalysis();
                 analysis.setId(result.getInt("id"));
                 analysis.setHistorialId(result.getInt("historial_id"));
-                
                 analysis.setAnalysisId(result.getInt("analisis_id"));
-                
-                                
                 analysisList.add(analysis);
             }
             
             Connection guardar = DbConnection.conectarseLocal();
-            String sqlSavebrand = "INSERT INTO pet_analyses (id, history_id, analysis_id )\n"
-            		+"VALUES (?,?,?);";
+            String sqlSavebrand = "INSERT INTO pet_analyses (id, history_id, analysis_id) VALUES (?, ?, ?);";
             PreparedStatement stmtsave = guardar.prepareStatement(sqlSavebrand);
             
-            double records=analysisList.size();
-            double contador=0;
-            double percent=0;
+            double records = analysisList.size();
+            double contador = 0;
+            double percent = 0;
+            int batchSize = 1000; // Tamaño del batch
+            int batchCount = 0;
             
-            for (PetAnalysis analysis : analysisList) {            	
-                int analysisId = analysis.id;
-                int hId = analysis.historialId;
-                int aId = analysis.analysisId;
-                 
+            for (PetAnalysis analysis : analysisList) {
+                stmtsave.setInt(1, analysis.getId());
+                stmtsave.setInt(2, analysis.getHistorialId());               
+                stmtsave.setInt(3, analysis.getAnalysisId());
                 
+                stmtsave.addBatch();
+                batchCount++;
+                contador++;
+                percent = (contador / records) * 100;
                 
-                stmtsave.setInt(1, analysisId);
-                stmtsave.setInt(2, hId);               
-                
-                stmtsave.setInt(3, aId);
-                
-                contador+=1;
-                percent = contador/records*100;
-                
-                int rows = stmtsave.executeUpdate();
-                
-                if (rows > 0) {
-                	
-                   System.out.println("Porcentaje de Avance analyisis "+percent+"%");
-                    
+                if (batchCount % batchSize == 0) {
+                    stmtsave.executeBatch();
+                    System.out.println("Porcentaje de Avance analysis: " + percent + "%");
+                    batchCount = 0;
                 }
+            }
+            
+            if (batchCount > 0) {
+                stmtsave.executeBatch(); // Ejecutar los restantes
+                System.out.println("Porcentaje de Avance analysis: 100%");
             }
             
             Statement stmtUpdateSeq = guardar.createStatement();
             stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('pet_analyses', 'id'), (SELECT MAX(id) FROM pet_analyses))");
             stmtUpdateSeq.close();
+            
+            stmtsave.close();
             guardar.close();
             connection.close();
         } catch (SQLException e) {
@@ -74,6 +72,5 @@ public class PetAnalysisMigrationHelper {
         }
         
         return true;
-	}
-
+    }
 }

@@ -7,94 +7,115 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import models.Purchase;
 import models.DbConnection;
 
 public class PurchaseMigrationHelper {
-	public static boolean purchasesMigration() {
+    private static final int BATCH_SIZE = 500; // Tamaño del batch para optimizar la carga
+
+    public static boolean purchasesMigration() {
         ArrayList<Purchase> purchaseList = new ArrayList<>();
+
+        Connection remoteConn = null;
+        Connection localConn = null;
+        PreparedStatement stmtSave = null;
+        ResultSet resultSet = null;
+
         try {
-            Connection connection = DbConnection.conectarseRemoto();
-            String sqlPurchases = "select id, proveedor_id, compra_nodoc, compra_condicion, compra_subtotal,\n"
-            		+ "compra_montoiva, compra_montoretencion, compra_total,sucursal_id,compra_fecha\n"
-            		+ "from comprasproductos;";
-            
-            PreparedStatement stmt = connection.prepareStatement(sqlPurchases);
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
+            // Conectar a la base de datos remota
+            remoteConn = DbConnection.conectarseRemoto();
+            String sqlPurchases = "SELECT id, proveedor_id, compra_nodoc, compra_condicion, compra_subtotal, " +
+                                  "compra_montoiva, compra_montoretencion, compra_total, sucursal_id, compra_fecha " +
+                                  "FROM comprasproductos;";
+
+            PreparedStatement stmt = remoteConn.prepareStatement(sqlPurchases);
+            resultSet = stmt.executeQuery();
+
+            while (resultSet.next()) {
                 Purchase purchase = new Purchase();
-                purchase.setId(result.getInt("id"));
-                purchase.setSupplier_id(result.getInt("proveedor_id"));
-                purchase.setInvoice_number(result.getString("compra_nodoc"));
-                purchase.setPayment_condition(result.getString("compra_condicion"));                
-                purchase.setSubtotal_amount(result.getDouble("compra_subtotal"));                
-                purchase.setTax_amount(result.getDouble("compra_montoiva"));
-                purchase.setRetention_amount(result.getDouble("compra_montoretencion"));
-                purchase.setTotal(result.getDouble("compra_total"));
-                purchase.setBranch_id(result.getInt("sucursal_id"));
+                purchase.setId(resultSet.getInt("id"));
+                purchase.setSupplier_id(resultSet.getInt("proveedor_id"));
+                purchase.setInvoice_number(resultSet.getString("compra_nodoc"));
+                purchase.setPayment_condition(resultSet.getString("compra_condicion"));
+                purchase.setSubtotal_amount(resultSet.getDouble("compra_subtotal"));
+                purchase.setTax_amount(resultSet.getDouble("compra_montoiva"));
+                purchase.setRetention_amount(resultSet.getDouble("compra_montoretencion"));
+                purchase.setTotal(resultSet.getDouble("compra_total"));
+                purchase.setBranch_id(resultSet.getInt("sucursal_id"));
                 purchase.setCreated_by(1);
-                purchase.setCreated_at(result.getDate("compra_fecha"));
+                purchase.setCreated_at(resultSet.getDate("compra_fecha"));
+
                 purchaseList.add(purchase);
             }
-            
-            Connection guardar = DbConnection.conectarseLocal();
-            String sqlSavePurchase = "INSERT INTO purchases (id, supplier_id, invoice_number, payment_condition,\n"
-            		+"subtotal_amount, tax_amount, retention_amount, total, branch_id, created_by,created_at )\n"
-            		+"VALUES (?,?,?,?,?,?,?,?,?,?,?);";
-            PreparedStatement stmtsave = guardar.prepareStatement(sqlSavePurchase);
-            
-            double records=purchaseList.size();
-            double contador=0;
-            double percent=0;
-            
-            for (Purchase purchase : purchaseList) {            	
-                int purchaseId = purchase.id;
-                int supplierId = purchase.supplier_id;
-                String invoiceNumber = purchase.invoice_number;
-                String paymentCondition = purchase.payment_condition;
-                Double subTotal = purchase.subtotal_amount;
-                Double tax = purchase.tax_amount;
-                Double retention = purchase.retention_amount;
-                Double total = purchase.total;                
-                int branch = purchase.branch_id;
-                int createdBy = purchase.created_by;                
-                Date brandCreatedAt = purchase.created_at;                
-                
-                stmtsave.setInt(1, purchaseId);
-                stmtsave.setInt(2, supplierId);
-                stmtsave.setString(3, invoiceNumber);
-                stmtsave.setString(4, paymentCondition);
-                stmtsave.setDouble(5, subTotal);
-                stmtsave.setDouble(6, tax);
-                stmtsave.setDouble(7, retention);
-                stmtsave.setDouble(8, total);
-                stmtsave.setInt(9, branch);
-                stmtsave.setInt(10, createdBy);                
-                stmtsave.setDate(11, brandCreatedAt);
-                
-                int rows = stmtsave.executeUpdate();
-                
-                contador+=1;
-                percent = contador/records*100;
-                
-                if (rows > 0) {
-                	
-                   System.out.println("Porcentaje de Avance compras "+percent+"%");                    
+
+            // Conectar a la base de datos local
+            localConn = DbConnection.conectarseLocal();
+            localConn.setAutoCommit(false); // Deshabilita auto-commit para mejorar rendimiento
+
+            String sqlInsert = "INSERT INTO purchases " +
+                               "(id, supplier_id, invoice_number, payment_condition, subtotal_amount, " +
+                               "tax_amount, retention_amount, total, branch_id, created_by, created_at) " +
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            stmtSave = localConn.prepareStatement(sqlInsert);
+            int batchCounter = 0;
+
+            for (Purchase purchase : purchaseList) {
+                stmtSave.setInt(1, purchase.getId());
+                stmtSave.setInt(2, purchase.getSupplier_id());
+                stmtSave.setString(3, purchase.getInvoice_number());
+                stmtSave.setString(4, purchase.getPayment_condition());
+                stmtSave.setDouble(5, purchase.getSubtotal_amount());
+                stmtSave.setDouble(6, purchase.getTax_amount());
+                stmtSave.setDouble(7, purchase.getRetention_amount());
+                stmtSave.setDouble(8, purchase.getTotal());
+                stmtSave.setInt(9, purchase.getBranch_id());
+                stmtSave.setInt(10, purchase.getCreated_by());
+                stmtSave.setDate(11, purchase.getCreated_at());
+
+                stmtSave.addBatch();
+                batchCounter++;
+
+                if (batchCounter % BATCH_SIZE == 0) {
+                    stmtSave.executeBatch();
+                    localConn.commit();
+                    System.out.println("Migradas " + batchCounter + " compras...");
                 }
             }
-            
-            Statement stmtUpdateSeq = guardar.createStatement();
+
+            // Ejecutar batch restante
+            stmtSave.executeBatch();
+            localConn.commit();
+
+            // Actualizar secuencia en PostgreSQL
+            Statement stmtUpdateSeq = localConn.createStatement();
             stmtUpdateSeq.execute("SELECT setval(pg_get_serial_sequence('purchases', 'id'), (SELECT MAX(id) FROM purchases))");
             stmtUpdateSeq.close();
-            guardar.close();
-            connection.close();
+
+            System.out.println("Migración completada exitosamente.");
+            return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
+            if (localConn != null) {
+                try {
+                    localConn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
             return false;
-        }
-        
-        return true;
-    }
 
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+                if (stmtSave != null) stmtSave.close();
+                if (localConn != null) localConn.setAutoCommit(true);
+                if (localConn != null) localConn.close();
+                if (remoteConn != null) remoteConn.close();
+            } catch (SQLException closeEx) {
+                closeEx.printStackTrace();
+            }
+        }
+    }
 }

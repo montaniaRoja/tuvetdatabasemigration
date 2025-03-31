@@ -9,169 +9,187 @@ public class Migrations {
 		
 		
 		 if (BranchMigrationHelper.branchesMigration()) {
-	            JOptionPane.showMessageDialog(null, "Sucursales migradas exitosamente");
+	            System.out.println("Sucursales migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los sucursales");
 	        }
 		 if (CountryMigrationHelper.countriesMigration()) {
-	            JOptionPane.showMessageDialog(null, "Paises migradas exitosamente");
+			 System.out.println("Paises migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los paises");
 	        }
 		
 		 if (UserMigrationHelper.usersMigration()) {
-	            JOptionPane.showMessageDialog(null, "Usuarios migradas exitosamente");
+			 System.out.println("Usuarios migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los usuarios");
 	        }
 		
 		 if (SupplierMigrationHelper.suppliersMigration()) {
-	            JOptionPane.showMessageDialog(null, "Proveedores migradas exitosamente");
+			 System.out.println("Proveedores migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los proveedores");
 	        }
 		 
 		 if (BrandMigrationHelper.brandsMigration()) {
-	            JOptionPane.showMessageDialog(null, "Marcas migradas exitosamente");
+			 System.out.println("Marcas migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los marcas");
 	        }
 		 
 		 if (TaxMigrationHelper.taxesMigration()) {
-	            JOptionPane.showMessageDialog(null, "Impuestos migradas exitosamente");
+			 System.out.println("Impuestos migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los impuestos");
 	        }
 		 
 		 if (CategoryMigrationHelper.categoriesMigration()) {
-	            JOptionPane.showMessageDialog(null, "Categorias migradas exitosamente");
+			 System.out.println("Categorias migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los Categorias");
 	        }
 		 
 		 if (MolMigrationHelper.moleculesMigration()) {
-	            JOptionPane.showMessageDialog(null, "Moleculas migradas exitosamente");
+			 System.out.println("Moleculas migradas exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los Moleculas");
 	        }
 		 
 		 if (ProductMigrationHelper.productsMigration()) {
-	            JOptionPane.showMessageDialog(null, "Productos migrados exitosamente");
+			 System.out.println("Productos migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los productos");
 	        }
 		 
 		 if (StockMigrationHelper.levelsMigration()) {
-	            JOptionPane.showMessageDialog(null, "existencias y reorden migrados exitosamente");
+			 System.out.println("existencias y reorden migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar existencia y reorden");
 	        }
 		 
 		 if (PurchaseMigrationHelper.purchasesMigration()) {
-	            JOptionPane.showMessageDialog(null, "encaabezados de compras migrados exitosamente");
+			 System.out.println("encaabezados de compras migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar encabezados de compra");
 	        }
 		 
 		 if (PurchaseDetailMigrationHelper.purchasesMigration()) {
-	            JOptionPane.showMessageDialog(null, "detalles de compras migrados exitosamente");
+			 System.out.println("detalles de compras migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar detalles de compra");
 	        }
 		 
 		 if (TransferMigrationHelper.transfersMigration()) {
-	            JOptionPane.showMessageDialog(null, "traslados migrados exitosamente");
+			 System.out.println("traslados migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar traslados");
 	        }
 		 
 		 if (TransferDetailMigrationHelper.transferDetailsMigration()) {
-	            JOptionPane.showMessageDialog(null, "detalles de traslados migrados exitosamente");
+			 System.out.println("detalles de traslados migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar traslados");
 	        }
 		 
 		 if (StockEntryMigrationHelper.entriesMigration()) {
-	            JOptionPane.showMessageDialog(null, "entradas migrados exitosamente");
+			 System.out.println("entradas migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar entradas");
 	        }
 		 
 		 if (StockExitMigrationHelper.exitsMigration()) {
-	            JOptionPane.showMessageDialog(null, "salidas migrados exitosamente");
+			 System.out.println("salidas migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar salidas");
 	        }
 	        
 		 if (CustomerMigrationHelper.customerMigration()) {
-	            JOptionPane.showMessageDialog(null, "clientes migrados exitosamente");
+			 System.out.println("clientes migrados exitosamente");
 	        }else {
 	        	JOptionPane.showMessageDialog(null, "hubo errores al migrar clientes");
 	        }
 	        
 	    
 		if (InvoiceMigrationHelper.invoiceMigration()) {
-            JOptionPane.showMessageDialog(null, "invoices migrados exitosamente");
+			System.out.println("invoices migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar invoices");
         }
 		
 		if (InvoiceDetailMigrationHelper.invoiceMigration()) {
-            JOptionPane.showMessageDialog(null, "detalle de invoices migrados exitosamente");
+			System.out.println("detalle de invoices migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar detalle de invoices");
         }
 		
 		if (CustomerPointsMigrationHelper.pointsMigration()) {
-            JOptionPane.showMessageDialog(null, "transacciones de puntos migrados exitosamente");
+			System.out.println("transacciones de puntos migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los puntos de los clientes");
         }
 		
 		if (GroomerMigrationHelper.groomersMigration()) {
-            JOptionPane.showMessageDialog(null, "gromistas migrados exitosamente");
+			System.out.println("gromistas migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los gromistas");
         }
 		
 		if (BreedMigrationHelper.breedsMigration()) {
-            JOptionPane.showMessageDialog(null, "Razas migrados exitosamente");
+			System.out.println("Razas migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los razas");
         }
 		
 		if (AnalisysMigrationHelper.analysisMigration()) {
-            JOptionPane.showMessageDialog(null, "analisis migrados exitosamente");
+			System.out.println("analisis migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los analisis");
         }
 		
 		if (PetMigrationHelper.petsMigration()) {
-            JOptionPane.showMessageDialog(null, "mascotas migrados exitosamente");
+			System.out.println("mascotas migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los mascotas");
         }
 		
 
 		if (HistoryMigrationHelper.historyMigration()) {
-            JOptionPane.showMessageDialog(null, "historiales migrados exitosamente");
+			System.out.println("historiales migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los historiales");
         }
 		
 		if (PrescriptionMigrationHelper.recetasMigration()) {
-            JOptionPane.showMessageDialog(null, "recetas migrados exitosamente");
+			System.out.println("recetas migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los recetas");
         }
 		
 		if (PetAnalysisMigrationHelper.analysisMigration()) {
-            JOptionPane.showMessageDialog(null, "analisis migrados exitosamente");
+			System.out.println("analisis migrados exitosamente");
         }else {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los analisis");
         }
+        
+        
+		if (IpMigrationHelper.ipsMigration()) {
+			System.out.println("ips migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los ip");
+        }
 		
 		
+		if (SessionMigrationHelper.sessionMigration()) {
+			System.out.println("sesiones migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los sesiones");
+        }
+		
+		if (SessionDetailMigrationHelper.sessionMigration()) {
+			System.out.println("detalles sesiones migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los detalles");
+        }
 		
 		}	
 
