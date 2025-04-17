@@ -191,6 +191,13 @@ public class Migrations {
         	JOptionPane.showMessageDialog(null, "hubo errores al migrar los detalles");
         }
 		
+		
+		if (SupplierStatementAccountMigrationHelper.statementMigration()) {
+			System.out.println("estados de cuenta migrados exitosamente");
+        }else {
+        	JOptionPane.showMessageDialog(null, "hubo errores al migrar los detalles");
+        }
+		
 		}	
 
 }

@@ -42,7 +42,7 @@ public class TransferDetailMigrationHelper {
         // Insertar datos en la base de datos local
         try (Connection guardar = DbConnection.conectarseLocal();
              PreparedStatement stmtsave = guardar.prepareStatement(
-                 "INSERT INTO transfer_details (id, transfer_id, product_id, quantity) VALUES (?,?,?,?)");
+                 "INSERT INTO transfer_details (id, transfer_id, product_id, sent_qty) VALUES (?,?,?,?)");
              Statement stmtUpdateSeq = guardar.createStatement()) {
 
             int batchSize = 100;

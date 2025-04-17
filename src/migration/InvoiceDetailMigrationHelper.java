@@ -11,7 +11,7 @@ public class InvoiceDetailMigrationHelper {
         String sqlInvoices = """
             SELECT id, id_hfactura, prod_id, sucursal_id, cantidad, monto_costo, precio, subtotal, Iva,
             monto_descuento, total_linea, validado_sn, anulada_sn, fecha
-            FROM dfacturas WHERE fecha < CURRENT_DATE;
+            FROM dfacturas;
         """;
 
         try (
